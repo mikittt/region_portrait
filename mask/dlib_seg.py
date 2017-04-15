@@ -110,11 +110,7 @@ if __name__=="__main__":
 
     predictor_path = os.path.expanduser('~')+"/dlib-19.3/shape_predictor_68_face_landmarks.dat"
 
-<<<<<<< HEAD
     image_path = "data/sample.jpg"
-=======
-    image_path = "data/2people.jpg"
->>>>>>> 8748c077e91a8f4318e8717d35109aaeb66aeb6b
 
     detector = dlib.get_frontal_face_detector()
     predictor = dlib.shape_predictor(predictor_path)
