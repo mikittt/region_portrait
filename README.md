@@ -17,7 +17,7 @@ python mask/mouse_mask.py
 
 and then 
 ```
-python src/run_mrf.py
+python src/run_mrf.py -c data/~.jpg -s data/~.jpg -o out/ -g 0
 ```
 
 
