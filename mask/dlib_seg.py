@@ -84,7 +84,7 @@ def parts_detection(im_path,predictor):
             cv2.destroyAllWindows()
         masks = np.vstack((l_eyes,r_eyes,noses,mouses,others)).reshape(-1,im_size[0],im_size[1])
         print(masks.shape)
-        np.save(im_path.split("/")[-1].split(".")[0]+"_mask.npy",masks)
+        np.save("../data"+im_path.split("/")[-1].split(".")[0]+"_mask.npy",masks)
 
 if __name__=="__main__":
 
