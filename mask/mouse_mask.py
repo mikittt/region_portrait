@@ -41,7 +41,7 @@ if __name__ == "__main__":
             masks.append(others)
             masks=np.array(masks)
             print(masks.shape)
-            np.save(file_name.split("/")[-1].split(".")[0]+"_mask.npy",masks)
+            np.save("../data/"+file_name.split("/")[-1].split(".")[0]+"_mask.npy",masks)
             for i in range(0,len(mask_point),2):
                 cv2.rectangle(img_vis, tuple(mask_point[i][::-1]),tuple(mask_point[i+1][::-1]), (0,0,255), -1)
             cv2.imwrite(file_name.split("/")[-1].split(".")[0]+"_visual.png",img_vis)
