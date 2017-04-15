@@ -181,12 +181,10 @@ class MRF(object):
             np.save("data/style_4_2_0_"+str(stlide)+".npy",np.array(patch4_2))
             np.save("data/style_4_2_1_"+str(stlide)+".npy",np.array(norm4_2)) 
             """
-            print(2)
         
             style_patch3_2=(xp.array(np.load("data/style_3_2_0_"+str(stlide)+".npy")),xp.array(np.load("data/style_3_2_1_"+str(stlide)+".npy")))
             style_patch4_2=(xp.array(np.load("data/style_4_2_0_"+str(stlide)+".npy")),xp.array(np.load("data/style_4_2_1_"+str(stlide)+".npy")))
 
-            print(3)
             if input_image is None:
                 if self.initial_image == 'content':
                     input_image = xp.asarray(content_image[:,:,::stlide,::stlide])
@@ -230,18 +228,24 @@ class MRF(object):
             near,size,size2 = util.nearest_neighbor_patch(content3_2_mask[0,i,:,:][xp.newaxis,xp.newaxis,:,:]*layer3_2, style_patch[i], style_patch_norm[i])
             style_loss = F.sum(F.square(content3_2_mask[0,i,:,:][xp.newaxis,xp.newaxis,:,:]*layer3_2))*(self.style_weight *size2/size)-F.sum(near)*(2.*self.style_weight/size) 
             loss_info.append(('style_', float(style_loss.data)))
-            loss+=style_loss
+            if i==4:
+                loss+=style_loss*3
+            else:
+                loss+=style_loss
         
         style_patch, style_patch_norm =  style4_2
         for i in range(mask_num):
             near,size,size2 = util.nearest_neighbor_patch(content4_2_mask[0,i,:,:][xp.newaxis,xp.newaxis,:,:]*layer4_2, style_patch[i], style_patch_norm[i])
             style_loss =  F.sum(F.square(content4_2_mask[0,i,:,:][xp.newaxis,xp.newaxis,:,:]*layer4_2))*(self.style_weight *size2/size)-F.sum(near)*(2.*self.style_weight/size) 
             loss_info.append(('style_', float(style_loss.data)))
-            loss+= style_loss
+            if i==4:
+                loss+=style_loss*3
+            else:
+                loss+=style_loss
         
         tv_loss = self.tv_weight * util.total_variation(link.x)
         loss_info.append(('tv', float(tv_loss.data)))
-        #loss += tv_loss
+        loss += tv_loss
         loss.backward()
         self.optimizer.update()
         return loss_info

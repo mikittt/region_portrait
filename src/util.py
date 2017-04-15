@@ -30,14 +30,12 @@ def gray(x):
 def nearest_neighbor_patch(x, patch, patch_norm):
     xp = cuda.get_array_module(x.data)
     conv = F.convolution_2d(x, W=patch, stride=1, pad=0)
-    norm_zero_index = np.where(patch_norm.data==0)
+    norm_zero_index = xp.where(patch_norm==0)
     tmp_patch_norm = patch_norm.copy()
     tmp_patch_norm[norm_zero_index]=1
     normal = conv.data/tmp_patch_norm
     tmp =xp.ones(patch_norm.shape)
     tmp[norm_zero_index]=0
-    #print(normal.shape)
-    #print(tmp.shape)
     normal = normal*tmp
     size = normal.shape[2]*normal.shape[3]
     min_index = xp.argmax(normal,axis=1).reshape(-1)
