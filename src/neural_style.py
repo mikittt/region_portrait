@@ -162,7 +162,7 @@ class MRF(object):
             style3_2_mask = F.max_pooling_2d(F.max_pooling_2d(style_mask,2,stride=2),2,stride=2)
             content4_2_mask = F.max_pooling_2d(content3_2_mask,2,stride=2)
             style4_2_mask = F.max_pooling_2d(style3_2_mask,2,stride=2)
-            """
+            
             patch3_2 = []
             norm3_2 = []
             patch4_2 = []
@@ -180,7 +180,7 @@ class MRF(object):
             np.save("data/style_3_2_1_"+str(stlide)+".npy",np.array(norm3_2))
             np.save("data/style_4_2_0_"+str(stlide)+".npy",np.array(patch4_2))
             np.save("data/style_4_2_1_"+str(stlide)+".npy",np.array(norm4_2)) 
-            """
+            
         
             style_patch3_2=(xp.array(np.load("data/style_3_2_0_"+str(stlide)+".npy")),xp.array(np.load("data/style_3_2_1_"+str(stlide)+".npy")))
             style_patch4_2=(xp.array(np.load("data/style_4_2_0_"+str(stlide)+".npy")),xp.array(np.load("data/style_4_2_1_"+str(stlide)+".npy")))
