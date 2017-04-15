@@ -41,12 +41,14 @@ if __name__ == "__main__":
                     masks.append(parts)
                     others *= 1-parts
                 else:
-                    masks.append(others)
+                    masks.append(parts*others)
                     others *= 1-parts
                     masks.append(others)
             masks=np.array(masks)
             print(masks.shape)
             np.save("data/"+file_name.split("/")[-1].split(".")[0]+"_mask.npy",masks)
+            cv2.imwrite(file_name.split("/")[-1].split(".")[0]+"_other_face.png",masks[4].astype(np.uint8)*255)
+            cv2.imwrite(file_name.split("/")[-1].split(".")[0]+"_other.png",masks[5].astype(np.uint8)*255)
             for i in range(0,len(mask_point),2):
                 cv2.rectangle(img_vis, tuple(mask_point[i][::-1]),tuple(mask_point[i+1][::-1]), (0,0,255), 1)
             cv2.imwrite(file_name.split("/")[-1].split(".")[0]+"_visual.png",img_vis)

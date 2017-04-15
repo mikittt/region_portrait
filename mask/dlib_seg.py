@@ -94,10 +94,10 @@ def parts_detection(im_path,predictor):
         mouses = np.max(np.array(mouses),axis=0)
         faces  = np.max(np.array(faces) ,axis=0)
 
-        #cv2.imwrite(im_path.split("/")[-1].split(".")[0]+"_other_face.png",faces.astype(np.uint8)*255)
+        cv2.imwrite(im_path.split("/")[-1].split(".")[0]+"_other_face.png",faces.astype(np.uint8)*255)
         ## other region
         others = np.ones(im_size)*(1-faces)*(1-l_eyes)*(1-r_eyes)*(1-noses)*(1-mouses)
-        #cv2.imwrite(im_path.split("/")[-1].split(".")[0]+"_other.png",others.astype(np.uint8)*255)
+        cv2.imwrite(im_path.split("/")[-1].split(".")[0]+"_other.png",others.astype(np.uint8)*255)
         if check_dots or check_mask:
             cv2.imshow("img",im)
             cv2.waitKey(0)
@@ -110,7 +110,7 @@ if __name__=="__main__":
 
     predictor_path = os.path.expanduser('~')+"/dlib-19.3/shape_predictor_68_face_landmarks.dat"
 
-    image_path = "data/sample.jpg"
+    image_path = "data/crop_ria.jpg"
 
     detector = dlib.get_frontal_face_detector()
     predictor = dlib.shape_predictor(predictor_path)
