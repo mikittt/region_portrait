@@ -20,7 +20,7 @@ if __name__ == "__main__":
     count=0
     mask_point = []
     point_place = ["left up - left eye","right down - right eye","left up - right eye","right down - right eye","left up - nose", "right down - nose", "left up - mouse", "right down - mouse"]
-    file_name="046.jpg"
+    file_name="data/046.jpg"
     # Create a black image, a window and bind the function to window
     img = cv2.imread(file_name)
     img_vis = img.copy()
