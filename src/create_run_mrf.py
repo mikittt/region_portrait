@@ -1,5 +1,5 @@
 import argparse
-import style_transfer_runner
+import create_style_transfer_runner
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
@@ -48,4 +48,4 @@ if __name__ == '__main__':
                         help='use luminance only algorithm')
     args = parser.parse_args()
 
-    style_transfer_runner.run(args)
+    create_style_transfer_runner.run(args)

@@ -136,15 +136,14 @@ class MRF(object):
     def __fit(self, content_image, style_image, input_content_mask, input_style_mask, epoch_num, callback=None):
         xp = self.xp
         input_image = None
-        height, width = content_image.shape[-2:]
+        #height, width = content_image.shape[-2:]
         base_epoch = 0
-        mask_num = input_content_mask.shape[1]
+        mask_num = input_style_mask.shape[1]
         for stlide in [4, 2, 1][-self.resolution_num:]:
-            if width // stlide < 64:
-                continue
-            content_x    = Variable(xp.asarray(content_image[:,:,::stlide,::stlide]), volatile=True)
-            content_mask = Variable(xp.asarray(input_content_mask[:,:,::stlide,::stlide],dtype=xp.float32),volatile=True)
-            """
+            #if width // stlide < 64:
+            #    continue
+            #content_x    = Variable(xp.asarray(content_image[:,:,::stlide,::stlide]), volatile=True)
+            #content_mask = Variable(xp.asarray(input_content_mask[:,:,::stlide,::stlide],dtype=xp.float32),volatile=True)
             style_mask   = Variable(xp.asarray(input_style_mask[:,:,::stlide,::stlide],dtype=xp.float32), volatile=True)
             
             
@@ -152,20 +151,20 @@ class MRF(object):
                 style_x = Variable(util.luminance_only(xp.asarray(style_image[:,:,::stlide,::stlide]), content_x.data), volatile=True)
             else:
                 style_x = Variable(xp.asarray(style_image[:,:,::stlide,::stlide]), volatile=True)
-            """
+            
             #content_layer_names = self.content_layer_names
-            _,content_layer4_2 = self.model(content_x)
+            #_,content_layer4_2 = self.model(content_x)
             #content_layers = [(name, content_layers[name]) for name in content_layer_names]
             #style_layer_names = self.style_layer_names
             
 
-            #style_layer3_2,style_layer4_2 = self.model(style_x)
+            style_layer3_2,style_layer4_2 = self.model(style_x)
 
-            content3_2_mask = F.max_pooling_2d(F.max_pooling_2d(content_mask,2,stride=2),2,stride=2)
-            #style3_2_mask   = F.max_pooling_2d(F.max_pooling_2d(style_mask,2,stride=2),2,stride=2)
-            content4_2_mask = F.max_pooling_2d(content3_2_mask,2,stride=2)
-            #style4_2_mask   = F.max_pooling_2d(style3_2_mask,2,stride=2)
-            """
+            #content3_2_mask = F.max_pooling_2d(F.max_pooling_2d(content_mask,2,stride=2),2,stride=2)
+            style3_2_mask   = F.max_pooling_2d(F.max_pooling_2d(style_mask,2,stride=2),2,stride=2)
+            #content4_2_mask = F.max_pooling_2d(content3_2_mask,2,stride=2)
+            style4_2_mask   = F.max_pooling_2d(style3_2_mask,2,stride=2)
+            
             patch3_2 = []
             norm3_2  = []
             patch4_2 = []
@@ -186,80 +185,4 @@ class MRF(object):
                 pickle.dump(list(patch4_2),f)
             with open("data/"+self.file_id+"style_4_2_1_"+str(stlide)+".pkl","wb") as f:
                 pickle.dump(list(norm4_2),f)
-            
-            """
-            with open("data/"+self.file_id+"style_3_2_0_"+str(stlide)+".pkl","rb") as f:
-                d1 = pickle.load(f)
-            with open("data/"+self.file_id+"style_3_2_1_"+str(stlide)+".pkl","rb") as f:
-                d2 = pickle.load(f)
-            with open("data/"+self.file_id+"style_4_2_0_"+str(stlide)+".pkl","rb") as f:
-                d3 = pickle.load(f)
-            with open("data/"+self.file_id+"style_4_2_1_"+str(stlide)+".pkl","rb") as f:
-                d4 = pickle.load(f)
-            style_patch3_2=(d1,d2)
-            style_patch4_2=(d3,d4)
 
-            if input_image is None:
-                if self.initial_image == 'content':
-                    input_image = xp.asarray(content_image[:,:,::stlide,::stlide])
-                else:
-                    input_image = xp.random.uniform(-20, 20, size=content_x.data.shape).astype(np.float32)
-            else:
-                input_image = input_image.repeat(2, 2).repeat(2, 3)
-                h, w = content_x.data.shape[-2:]
-                input_image = input_image[:,:,:h,:w]
-            link = chainer.Link(x=input_image.shape)
-            if self.device_id >= 0:
-                link.to_gpu()
-            link.x.data[:] = xp.asarray(input_image)
-            self.optimizer.setup(link)
-            for epoch in six.moves.range(epoch_num):
-                loss_info = self.__fit_one(link, content_layer4_2.data, style_patch3_2, style_patch4_2, content3_2_mask.data, content4_2_mask.data)
-                if callback:
-                    callback(base_epoch + epoch, link.x, loss_info)
-            base_epoch += epoch_num
-            input_image = link.x.data
-            print time.time()-self.start_time,"s"
-        return link.x
-
-    def __fit_one(self, link, content4_2, style3_2, style4_2, content3_2_mask, content4_2_mask):
-        xp = self.xp
-        mask_num = content3_2_mask.shape[1]
-        link.zerograds()
-        layer3_2,layer4_2 = self.model(link.x)
-        if self.keep_color:
-            #trans_layers = self.model(util.gray(link.x))
-            print "don't keep color!"
-        loss_info = []
-        loss = Variable(xp.zeros((), dtype=np.float32))
-        #layer = layers[name]
-        content_loss = self.content_weight * F.mean_squared_error(layer4_2, Variable(content4_2))
-        loss_info.append(('content_', float(content_loss.data)))
-        loss += content_loss
-
-        style_patch, style_patch_norm =  style3_2
-        for i in range(mask_num):
-            coco = content3_2_mask[0,i,:,:][xp.newaxis,xp.newaxis,:,:]*layer3_2
-            cocoS = xp.array(style_patch[i])
-            cocoN = xp.array(style_patch_norm[i])
-            near,size,size2 = util.nearest_neighbor_patch(coco, cocoS, cocoN)
-            style_loss = F.sum(F.square(content3_2_mask[0,i,:,:][xp.newaxis,xp.newaxis,:,:]*layer3_2))*(self.style_weight *size2/size)-F.sum(near)*(2.*self.style_weight/size) 
-            loss_info.append(('style_', float(style_loss.data)))
-            loss+=style_loss
-        
-        style_patch, style_patch_norm =  style4_2
-        for i in range(mask_num):
-            coco = content4_2_mask[0,i,:,:][xp.newaxis,xp.newaxis,:,:]*layer4_2
-            cocoS = xp.array(style_patch[i])
-            cocoN = xp.array(style_patch_norm[i])
-            near,size,size2 = util.nearest_neighbor_patch(coco, cocoS, cocoN)
-            style_loss =  F.sum(F.square(content4_2_mask[0,i,:,:][xp.newaxis,xp.newaxis,:,:]*layer4_2))*(self.style_weight *size2/size)-F.sum(near)*(2.*self.style_weight/size) 
-            loss_info.append(('style_', float(style_loss.data)))
-            loss+=style_loss
-        
-        tv_loss = self.tv_weight * util.total_variation(link.x)
-        loss_info.append(('tv', float(tv_loss.data)))
-        loss += tv_loss
-        loss.backward()
-        self.optimizer.update()
-        return loss_info

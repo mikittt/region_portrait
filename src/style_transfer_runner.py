@@ -71,17 +71,17 @@ def run(args):
     
 
     if args.method == 'mrf':
-        model = MRF(vgg, optimizer, args.content_weight, args.style_weight, args.tv_weight, content_layers, style_layers, args.resolution_num, args.gpu, initial_image=args.initial_image, keep_color=args.keep_color)
-        content_mask = np.load(re.sub(args.content.split("/")[-1],"",args.content)+args.content.split("/")[-1].split(".")[0]+"_mask.npy")
-        style_mask = np.load(re.sub(args.style.split("/")[-1],"",args.style)+args.style.split("/")[-1].split(".")[0]+"_mask.npy")
-        target_width = args.width
+        model = MRF(vgg, optimizer, args.style,args.content_weight, args.style_weight, args.tv_weight, content_layers, style_layers, args.resolution_num, args.gpu, initial_image=args.initial_image, keep_color=args.keep_color)
+        content_mask  = np.load(re.sub(args.content.split("/")[-1],"",args.content)+args.content.split("/")[-1].split(".")[0]+"_mask.npy")
+        style_mask    = np.load(re.sub(args.style.split("/")[-1],"",args.style)+args.style.split("/")[-1].split(".")[0]+"_mask.npy")
+        target_width  = args.width
         height, width = style_mask.shape[1:]
         target_height = int(round(float(height * target_width) / width))
-        style_mask = np.array([cv2.resize(part,(target_width,target_height)) for part in style_mask])[np.newaxis,:]
-        target_width = args.width
+        style_mask    = np.array([cv2.resize(part,(target_width,target_height)) for part in style_mask])[np.newaxis,:]
+        target_width  = args.width
         height, width = content_mask.shape[1:]
         target_height = int(round(float(height * target_width) / width))
-        content_mask = np.array([cv2.resize(part,(target_width,target_height)) for part in content_mask])[np.newaxis,:]
+        content_mask  = np.array([cv2.resize(part,(target_width,target_height)) for part in content_mask])[np.newaxis,:]
         
         print(content_mask.shape)
         print(content_image.shape)

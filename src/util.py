@@ -22,6 +22,17 @@ def patch(x, ksize=3, stride=1, pad=0):
     patch_norm = xp.linalg.norm(patch.reshape(patch.shape[0],-1),axis=1)[xp.newaxis,:,xp.newaxis,xp.newaxis]
     return patch,patch_norm
 
+def patch_pre(x, ksize=3, stride=1, pad=0):
+    xp = cuda.get_array_module(x.data)
+    b, ch, h, w = x.data.shape
+    patch = xp.array([x.data[0,:,i:i+ksize,j:j+ksize].tolist() for i in range(h-2) for j in range(w-2)],dtype=xp.float32)
+    print "ok"
+    patch_norm = xp.linalg.norm(patch.reshape(patch.shape[0],-1),axis=1)
+    indices = xp.where(patch_norm!=0)
+    patch_norm = patch_norm[indices][xp.newaxis,:,xp.newaxis,xp.newaxis]
+    patch = patch[indices[0],:,:,:]
+    return patch,patch_norm
+
 def gray(x):
     xp = cuda.get_array_module(x.data)
     w = Variable(xp.asarray([[[[0.114]], [[0.587]], [[0.299]]], [[[0.114]], [[0.587]], [[0.299]]], [[[0.114]], [[0.587]], [[0.299]]]], dtype=np.float32), volatile=x.volatile)
@@ -31,17 +42,17 @@ def nearest_neighbor_patch(x, patch, patch_norm):
     xp = cuda.get_array_module(x.data)
     conv = F.convolution_2d(x, W=patch, stride=1, pad=0)
     norm_zero_index = xp.where(patch_norm==0)
-    tmp_patch_norm = patch_norm.copy()
+    tmp_patch_norm  = patch_norm.copy()
     tmp_patch_norm[norm_zero_index]=1
     normal = conv.data/tmp_patch_norm
-    tmp =xp.ones(patch_norm.shape)
+    tmp    = xp.ones(patch_norm.shape)
     tmp[norm_zero_index]=0
     normal = normal*tmp
     size = normal.shape[2]*normal.shape[3]
     min_index = xp.argmax(normal,axis=1).reshape(-1)
-    index_3 = np.arange(size)%normal.shape[3]
-    index_2 = np.arange(size)/normal.shape[3]
-    near = conv[0,min_index.tolist(),index_2.tolist(),index_3.tolist()]
+    index_3   = np.arange(size)%normal.shape[3]
+    index_2   = np.arange(size)/normal.shape[3]
+    near      = conv[0,min_index.tolist(),index_2.tolist(),index_3.tolist()]
     return near,float(normal.shape[2]*normal.shape[3]*patch[0].size),patch[0,0,:,:].size
 
 def luminance_only(x, y):
