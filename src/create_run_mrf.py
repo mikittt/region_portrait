@@ -8,11 +8,11 @@ if __name__ == '__main__':
                         help='model type')
     parser.add_argument('--model', '-m', default='model/vgg16.model',
                         help='model file path')
-    parser.add_argument('--content', '-c', required=True,
+    parser.add_argument('--content', '-c',default="",
                         help='Original image file path')
-    parser.add_argument('--style', '-s', required=True,
+    parser.add_argument('--style', '-s', default="",
                         help='Style image file path')
-    parser.add_argument('--out_dir', '-o', default='output',
+    parser.add_argument('--out_dir', '-o', default='out',
                         help='Output directory path')
     parser.add_argument('--gpu', '-g', default=-1, type=int,
                         help='GPU ID (negative value indicates CPU)')

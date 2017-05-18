@@ -177,6 +177,7 @@ class MRF(object):
                 norm3_2.append(cuda.to_cpu(tmp_norm3_2))
                 patch4_2.append(cuda.to_cpu(tmp_patch4_2))
                 norm4_2.append(cuda.to_cpu(tmp_norm4_2))
+            print("--------------------------------")
             with open("data/"+self.file_id+"style_3_2_0_"+str(stlide)+".pkl","wb") as f:
                 pickle.dump(list(patch3_2),f)
             with open("data/"+self.file_id+"style_3_2_1_"+str(stlide)+".pkl","wb") as f:
