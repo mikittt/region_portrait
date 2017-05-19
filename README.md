@@ -1,3 +1,6 @@
+※　all files are changed so it may be very hard to run these codes in other environments
+
+
 # portrait generator
 
 put your content/style file in ```data/```
