@@ -144,7 +144,8 @@ class MRF(object):
                 continue
             content_x    = Variable(xp.asarray(content_image[:,:,::stlide,::stlide]), volatile=True)
             content_mask = Variable(xp.asarray(input_content_mask[:,:,::stlide,::stlide],dtype=xp.float32),volatile=True)
-            """
+            
+            #need
             style_mask   = Variable(xp.asarray(input_style_mask[:,:,::stlide,::stlide],dtype=xp.float32), volatile=True)
             
             
@@ -152,19 +153,23 @@ class MRF(object):
                 style_x = Variable(util.luminance_only(xp.asarray(style_image[:,:,::stlide,::stlide]), content_x.data), volatile=True)
             else:
                 style_x = Variable(xp.asarray(style_image[:,:,::stlide,::stlide]), volatile=True)
-            """
+
+            style_layer3_2,style_layer4_2 = self.model(style_x)
+            style3_2_mask   = F.max_pooling_2d(F.max_pooling_2d(style_mask,2,stride=2),2,stride=2)
+            style4_2_mask   = F.max_pooling_2d(style3_2_mask,2,stride=2)
+            
+            
+            
             #content_layer_names = self.content_layer_names
             _,content_layer4_2 = self.model(content_x)
             #content_layers = [(name, content_layers[name]) for name in content_layer_names]
             #style_layer_names = self.style_layer_names
             
 
-            #style_layer3_2,style_layer4_2 = self.model(style_x)
-
             content3_2_mask = F.max_pooling_2d(F.max_pooling_2d(content_mask,2,stride=2),2,stride=2)
-            #style3_2_mask   = F.max_pooling_2d(F.max_pooling_2d(style_mask,2,stride=2),2,stride=2)
             content4_2_mask = F.max_pooling_2d(content3_2_mask,2,stride=2)
-            #style4_2_mask   = F.max_pooling_2d(style3_2_mask,2,stride=2)
+            
+            # need
             """
             patch3_2 = []
             norm3_2  = []
@@ -186,8 +191,10 @@ class MRF(object):
                 pickle.dump(list(patch4_2),f)
             with open("data/"+self.file_id+"style_4_2_1_"+str(stlide)+".pkl","wb") as f:
                 pickle.dump(list(norm4_2),f)
-            
             """
+            
+            
+            
             with open("data/"+self.file_id+"style_3_2_0_"+str(stlide)+".pkl","rb") as f:
                 d1 = pickle.load(f)
             with open("data/"+self.file_id+"style_3_2_1_"+str(stlide)+".pkl","rb") as f:

@@ -10,11 +10,9 @@ if __name__ == '__main__':
                         help='model file path')
     parser.add_argument('--content', '-c', required=True,
                         help='Original image file path')
-    parser.add_argument('--style', '-s', required=True,
-                        help='Style image file path')
-    parser.add_argument('--out_dir', '-o', default='output',
+    parser.add_argument('--out_dir', '-o', default='out',
                         help='Output directory path')
-    parser.add_argument('--gpu', '-g', default=-1, type=int,
+    parser.add_argument('--gpu', '-g', default=0, type=int,
                         help='GPU ID (negative value indicates CPU)')
     parser.add_argument('--iter', default=100, type=int,
                         help='number of iteration for each resolution')

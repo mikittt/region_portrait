@@ -36,7 +36,9 @@ def run(args):
         vgg = VGG()
     content_image = open_and_resize_image(args.content, args.width, vgg)
     print 'loading content image completed'
-    style_image = open_and_resize_image(args.style, args.width, vgg)
+    style_file_id = os.path.split(args.content)[1].split(".")[0].split("_")[1]
+    style_filename = os.path.join("data/",style_file_id+".jpg")
+    style_image = open_and_resize_image(style_filename, args.width, vgg)
     if args.match_color_histogram:
         style_image = util.match_color_histogram(style_image, content_image)
     if args.luminance_only:
@@ -71,9 +73,9 @@ def run(args):
     
 
     if args.method == 'mrf':
-        model = MRF(vgg, optimizer, args.style,args.content_weight, args.style_weight, args.tv_weight, content_layers, style_layers, args.resolution_num, args.gpu, initial_image=args.initial_image, keep_color=args.keep_color)
+        model = MRF(vgg, optimizer, style_filename, args.content_weight, args.style_weight, args.tv_weight, content_layers, style_layers, args.resolution_num, args.gpu, initial_image=args.initial_image, keep_color=args.keep_color)
         content_mask  = np.load(re.sub(args.content.split("/")[-1],"",args.content)+args.content.split("/")[-1].split(".")[0]+"_mask.npy")
-        style_mask    = np.load(re.sub(args.style.split("/")[-1],"",args.style)+args.style.split("/")[-1].split(".")[0]+"_mask.npy")
+        style_mask    = np.load(re.sub(style_filename.split("/")[-1],"",style_filename)+style_filename.split("/")[-1].split(".")[0]+"_mask.npy")
         target_width  = args.width
         height, width = style_mask.shape[1:]
         target_height = int(round(float(height * target_width) / width))
@@ -97,4 +99,4 @@ def run(args):
     if args.luminance_only:
         out_image = util.join_yiq_to_bgr(out_image, content_iq)
     image = vgg.postprocess(out_image[0], output_type='RGB').clip(0, 255).astype(np.uint8)
-    Image.fromarray(image).save(os.path.join(args.out_dir, 'out.png'))
+    Image.fromarray(image).save(os.path.join(args.out_dir, os.path.split(args.content)[1]))
